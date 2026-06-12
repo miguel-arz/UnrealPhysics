@@ -40,6 +40,8 @@ void APhysicsProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
 		m_OwnerWeapon->ApplyDamage(Hit, this);
 	}
 
+	
+
 	if (m_DestroyOnHit)
 	{
 		Destroy();

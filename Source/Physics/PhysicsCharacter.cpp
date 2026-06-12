@@ -48,6 +48,41 @@ void APhysicsCharacter::BeginPlay()
 void APhysicsCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (HighlightedMesh)
+	{
+		HighlightedMesh->SetOverlayMaterial(nullptr);
+		HighlightedMesh = nullptr;
+	}
+
+	FVector vStartPoint = FirstPersonCameraComponent->GetComponentLocation();
+	FVector vEndPoint = FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetComponentRotation().Vector() * 10000;
+
+	FHitResult oHit;
+
+	FCollisionQueryParams oParams;
+	oParams.AddIgnoredActor(this);
+
+	AActor* aHittedActor;
+
+	if (GetWorld()->LineTraceSingleByChannel(oHit, vStartPoint, vEndPoint, ECC_Visibility, oParams))
+	{
+		vImpactPoint = oHit.ImpactPoint;
+		aHittedActor = oHit.GetActor();
+
+	}
+
+	if (oHit.GetComponent() && oHit.GetComponent()->IsSimulatingPhysics())
+	{
+		UMeshComponent* oMesh = Cast<UMeshComponent>(oHit.GetComponent());
+
+		oMesh->SetOverlayMaterial(m_HighlightMaterial);
+
+		HighlightedMesh = oMesh;
+	}
+
+	FVector vGoto = FirstPersonCameraComponent->GetComponentLocation()+FirstPersonCameraComponent->GetComponentRotation().Vector() * m_fOffset;
+	m_PhysicsHandle->SetTargetLocation(vGoto);
 }
 
 void APhysicsCharacter::NotifyControllerChanged()
@@ -65,7 +100,7 @@ void APhysicsCharacter::NotifyControllerChanged()
 }
 
 void APhysicsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{	
+{
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
@@ -75,7 +110,7 @@ void APhysicsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APhysicsCharacter::Look);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &APhysicsCharacter::Sprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &APhysicsCharacter::Sprint);
-		EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Triggered, this, &APhysicsCharacter::GrabObject);
+		EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &APhysicsCharacter::GrabObject);
 		EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &APhysicsCharacter::ReleaseObject);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &APhysicsCharacter::ZoomIn);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Completed, this, &APhysicsCharacter::ZoomOut);
@@ -124,10 +159,38 @@ void APhysicsCharacter::Sprint(const FInputActionValue& Value)
 
 void APhysicsCharacter::GrabObject(const FInputActionValue& Value)
 {
+	FVector vStartPoint = FirstPersonCameraComponent->GetComponentLocation();
+	FVector vEndPoint = FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetComponentRotation().Vector() * 10000;
+
+	FHitResult oHit;
+
+	FCollisionQueryParams oParams;
+	oParams.AddIgnoredActor(this);
+
+	AActor* aHittedActor;
+
+	if (GetWorld()->LineTraceSingleByChannel(oHit, vStartPoint, vEndPoint, ECC_Visibility, oParams))
+	{
+		vImpactPoint = oHit.ImpactPoint;
+		aHittedActor = oHit.GetActor();
+		
+	}
+
+	if (oHit.GetComponent() && oHit.GetComponent()->IsSimulatingPhysics())
+	{
+		m_PhysicsHandle->GrabComponent(oHit.GetComponent(), FName(), vImpactPoint, false);
+		m_PhysicsHandle->SetInterpolationSpeed(5000);
+		m_bIsGrabbing = true;
+		m_fOffset = oHit.Distance;
+		m_fAcelerador = 5000 / oHit.GetComponent()->GetMass();
+	}
+
 }
 
 void APhysicsCharacter::ReleaseObject(const FInputActionValue& Value)
 {
+	m_PhysicsHandle->ReleaseComponent();
+	m_bIsGrabbing = false;
 }
 
 void APhysicsCharacter::ZoomIn()

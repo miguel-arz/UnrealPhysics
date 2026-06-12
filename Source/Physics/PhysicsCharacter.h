@@ -98,6 +98,17 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FZoomOutSignature OnZoomOut;
+	
+	FVector vImpactPoint;
+	
+	bool m_bIsGrabbing;
+
+	float m_fOffset;
+
+	float m_fAcelerador;
+
+	UMeshComponent* HighlightedMesh = nullptr;
+
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = DebugData, meta = (AllowPrivateAccess = "true"))

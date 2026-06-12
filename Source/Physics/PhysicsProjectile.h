@@ -30,6 +30,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Damage)
 	UPhysicsWeaponComponent* m_OwnerWeapon;
+
 public:
 	APhysicsProjectile();
 

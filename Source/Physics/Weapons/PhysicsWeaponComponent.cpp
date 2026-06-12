@@ -58,23 +58,16 @@ void UPhysicsWeaponComponent::ApplyDamage(const FHitResult& rHit, AActor* pCause
 	{
 		pCauser = GetOwner();
 	}
+	if (m_iDamageType == 1)
+	{
 
-	UGameplayStatics::ApplyPointDamage(rHit.GetActor(), 50, pCauser->GetActorRotation().Vector(), rHit, UGameplayStatics::GetPlayerController(this, 0), pCauser, DamageTypeClass);
-	// Apply radial damage
-	// TODO: Bool m_bDamageInArea
-
-
-	//if (OtherComp && OtherComp->IsSimulatingPhysics())
-	//{
-	//	//UGameplayStatics::ApplyPointDamage(OtherActor, 50, GetActorRotation().Vector(), Hit, UGameplayStatics::GetPlayerController())
-	//	OtherComp->AddImpulseAtLocation(Hit.ImpactPoint, GetActorRotation().Vector() * 100000);
-	//	//HitComp->AddImpulse(GetActorRotation().Vector() * 100000);
-	//	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10, 50, FColor::Green, false, 1.f);
-	//}
-	//else
-	//{
-	//	DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10, 50, FColor::Red, false, 1.f);
-	//}
+		UGameplayStatics::ApplyPointDamage(rHit.GetActor(), 50, pCauser->GetActorRotation().Vector(), rHit, UGameplayStatics::GetPlayerController(this, 0), pCauser, DamageTypeClass);
+	}
+	else if (m_iDamageType == 2)
+	{
+		//UGameplayStatics::ApplyRadialDamage(rHit.GetActor(), 100, rHit.ImpactPoint, 4, pCauser->GetActorRotation().Vector(),  UGameplayStatics::GetPlayerController(this, 0), pCauser, DamageTypeClass);
+	}
+	
 
 }
 
