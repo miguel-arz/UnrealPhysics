@@ -65,10 +65,9 @@ void UPhysicsWeaponComponent::ApplyDamage(const FHitResult& rHit, AActor* pCause
 	}
 	else if (m_iDamageType == 2)
 	{
-		//UGameplayStatics::ApplyRadialDamage(rHit.GetActor(), 100, rHit.ImpactPoint, 4, pCauser->GetActorRotation().Vector(),  UGameplayStatics::GetPlayerController(this, 0), pCauser, DamageTypeClass);
+		TArray<AActor*> IgnoreActors = { pCauser };
+		UGameplayStatics::ApplyRadialDamage(rHit.GetActor(), 100, rHit.ImpactPoint, 500, DamageTypeClass, IgnoreActors, pCauser, UGameplayStatics::GetPlayerController(this, 0));
 	}
-	
-
 }
 
 bool UPhysicsWeaponComponent::AttachWeapon(APhysicsCharacter* TargetCharacter)

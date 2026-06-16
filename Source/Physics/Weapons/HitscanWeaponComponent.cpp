@@ -34,7 +34,7 @@ void UHitscanWeaponComponent::Fire()
 		if (oHit.GetComponent() && oHit.GetComponent()->IsSimulatingPhysics())
 		{
 			oHit.GetComponent()->AddImpulse(vLookingDir * 100000);
-		
+
 			DrawDebugSphere(GetWorld(), oHit.ImpactPoint, 3, 50, FColor::Green, false, 1.f);
 		}
 		else

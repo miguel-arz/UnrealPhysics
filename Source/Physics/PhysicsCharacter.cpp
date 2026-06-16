@@ -204,3 +204,4 @@ void APhysicsCharacter::ZoomOut()
 	m_Sensitivity = 1.f;
 	OnZoomOut.Broadcast();
 }
+

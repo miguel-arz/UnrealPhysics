@@ -147,5 +147,7 @@ protected:
 	void ZoomIn();
 	void ZoomOut();
 
+	
+
 };
 
