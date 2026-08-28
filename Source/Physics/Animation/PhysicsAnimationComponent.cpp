@@ -3,6 +3,7 @@
 
 #include "Animation/PhysicsAnimationComponent.h"
 #include "PhysicsAnimationComponent.h"
+#include "Engine/DamageEvents.h"
 #include "PhysicsEngine/ConstraintInstance.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include <GameFramework/Character.h>
@@ -48,7 +49,26 @@ void UPhysicsAnimationComponent::OnTakePointDamage(AActor* DamagedActor, float D
 	{
 		return;
 	}
-	 
+
+	UE_LOG(LogTemp, Warning, TEXT("Bone hit: %s"), *BoneName.ToString());
+
+
+	const FName HeadBone = FName(TEXT("head")); 
+
+	if (BoneName == HeadBone)
+	{
+		m_AnimatedBone = HeadBone;
+		m_Mesh->SetAllBodiesBelowSimulatePhysics(HeadBone, true, true);
+
+		m_Mesh->BreakConstraint(FVector::ZeroVector, FVector::ZeroVector, HeadBone);
+
+		m_fBlendWeight = 1.f;
+		m_Mesh->SetAllBodiesBelowPhysicsBlendWeight(HeadBone, 1.f);
+
+		DamagedActor->TakeDamage(9999.f, FDamageEvent(), InstigatedBy, DamageCauser);
+
+		return;
+	}
 	//m_Mesh->SetAllBodiesBelowPhysicsBlendWeight
 	m_fTimer = m_fBlendDuration;
 
